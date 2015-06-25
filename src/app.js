@@ -11,6 +11,7 @@ var profileAnime;
 var profileManga;
 var friends;
 
+//Art Window
 var art;
 var artLoadingText;
 var artPage;
@@ -227,9 +228,9 @@ function initMenus() {
 function setArtwork(imageUrl) {
 	var urlToUse;
 	if (current_watch.platform == 'basalt') {
-		urlToUse = 'http://floatingcube.web44.net/more/MAL_client/resize/?image=' + encodeURIComponent(imageUrl) + '&width=144&height=168';
+		urlToUse = 'http://floatingcube.web44.net/more/MAL_client/resize/?image=' + encodeURIComponent(imageUrl);
 	} else {
-		urlToUse = 'http://floatingcube.web44.net/more/MAL_client/resize/?image=' + encodeURIComponent(imageUrl) + '&width=144&height=168';
+		urlToUse = 'http://floatingcube.web44.net/more/MAL_client/dither/?image=' + encodeURIComponent(imageUrl);
 	}
 	art = new UI.Image({
 		position: new Vector2(0, 0),
@@ -259,7 +260,7 @@ var splash = new UI.Window();
 var splashImage = new UI.Image({
   position: new Vector2(0, 15),
   size: new Vector2(144, 100),
-  image:'images/logo.png'
+  image:'images/logo~color.png'
 });
 
 var splashText = new UI.Text({
