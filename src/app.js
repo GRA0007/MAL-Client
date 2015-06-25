@@ -2,6 +2,7 @@
 var UI = require('ui');
 var Vector2 = require('vector2');
 var Settings = require('settings');
+var ajax = require('ajax');
 
 //Menus
 var animeList;
@@ -27,6 +28,8 @@ var animeListViews = '0';
 var mangaListViews = '0';
 var comments = '0';
 var numFriends = '0';
+var avatarUrl = 'http://cdn.myanimelist.net/images/na.gif';
+var lastOnline = 'Now';
 var animeDays = '0.0';
 var animeWatching = '0';
 var animeCompleted = '0';
@@ -49,7 +52,7 @@ var configSend = '';
 var loggedIn = false;
 
 //Temporary Login
-Settings.data('loggedIn', true);
+//Settings.data('loggedIn', true);
 
 //Initialize settings and stuff
 function init() {
@@ -60,7 +63,53 @@ function init() {
 		id = Settings.data('id');
 		password = Settings.data('password');
 		configSend = '?username=' + username + '&password=' + password + '&id=' + id;
-		initMenus();
+		
+		//Download all dat data! (ajaxy stuff here)
+		console.log('Let\'s ajax!');
+		ajax({ url: 'https://api.atarashiiapp.com/profile/' + username, type: 'json' },
+			function(data) {
+				avatarUrl = data.avatar_url;
+				lastOnline = data.details.last_online;
+				gender = data.details.gender;
+				birthday = data.details.birthday;
+				location = data.details.location;
+				joinDate = data.details.join_date;
+				accessRank = data.details.access_rank;
+				animeListViews = data.details.anime_list_views;
+				mangaListViews = data.details.manga_list_views;
+				comments = data.details.comments;
+				//Anime stats
+				animeDays = data.anime_stats.time_days;
+				animeWatching = data.anime_stats.watching;
+				animeCompleted = data.anime_stats.completed;
+				animeOnHold = data.anime_stats.on_hold;
+				animeDropped = data.anime_stats.dropped;
+				animePlanToWatch = data.anime_stats.plan_to_watch;
+				animeTotalEntries = data.anime_stats.total_entries;
+				//Manga stats
+				mangaDays = data.manga_stats.time_days;
+				mangaReading = data.manga_stats.reading;
+				mangaCompleted = data.manga_stats.completed;
+				mangaOnHold = data.manga_stats.on_hold;
+				mangaDropped = data.manga_stats.dropped;
+				mangaPlanToRead = data.manga_stats.plan_to_read;
+				mangaTotalEntries = data.manga_stats.total_entries;
+				
+				//console.log('main data: ' + JSON.stringify(data, null, 4));
+				
+				ajax({ url: 'https://api.atarashiiapp.com/friends/' + username, type: 'json' },
+					function(data) {
+						numFriends = data.length;
+						//console.log('friends: ' + JSON.stringify(data, null, 4));
+					}
+				);
+				
+				console.log(avatarUrl);
+
+				//Initialize the menus
+				initMenus();
+			}
+		);
 	} else {
 		loggedIn = false;
 		Settings.data('loggedIn', false);
@@ -71,6 +120,10 @@ function init() {
 //Initialize those dynamic menus. To be called after online request.
 function initMenus() {
 	console.log('Initializing those dynamic menus');
+	//First, update the subtitles for the main menus
+	animeMenu.item(0, 0, {title: 'My Profile', subtitle: 'Spent Days: ' + animeDays});
+	mangaMenu.item(0, 0, {title: 'My Profile', subtitle: 'Spent Days: ' + mangaDays});
+	
 	animeList = new UI.Menu({
 		backgroundColor: 'white',
 		textColor: 'black',
@@ -260,7 +313,7 @@ var splash = new UI.Window();
 var splashImage = new UI.Image({
   position: new Vector2(0, 15),
   size: new Vector2(144, 100),
-  image:'images/logo~color.png'
+  image:'images/logo.png'
 });
 
 var splashText = new UI.Text({
