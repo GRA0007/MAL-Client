@@ -20,7 +20,7 @@ var artLoadingText;
 var artPage;
 
 //Variables
-var current_watch;
+var current_watch = {platform: "aplite"};
 var profile = {"avatar_url":"http://cdn.myanimelist.net/images/na.gif","details":{"last_online":"Now","gender":"Unknown","birthday":"January  1, 1900","location":"City, Country","website":"http://example.com","join_date":"January 1, 1900","access_rank":"Member","anime_list_views":0,"manga_list_views":0,"forum_posts":0,"aim":null,"comments":0,"msn":null,"yahoo":null},"anime_stats":{"time_days":0,"watching":0,"completed":0,"on_hold":0,"dropped":0,"plan_to_watch":0,"total_entries":0},"manga_stats":{"time_days":0,"reading":0,"completed":0,"on_hold":0,"dropped":0,"plan_to_read":0,"total_entries":0}};
 var friends = {};
 var animeList;
@@ -82,7 +82,7 @@ function initMenus() {
 	animeList = new UI.Menu({
 		backgroundColor: 'white',
 		textColor: 'black',
-		highlightBackgroundColor: 'blue',
+		highlightBackgroundColor: 'cobaltBlue',
 		highlightTextColor: 'black',
 		sections: [{
 			title: 'List',
@@ -102,7 +102,7 @@ function initMenus() {
 	mangaList = new UI.Menu({
 		backgroundColor: 'white',
 		textColor: 'black',
-		highlightBackgroundColor: 'blue',
+		highlightBackgroundColor: 'cobaltBlue',
 		highlightTextColor: 'black',
 		sections: [{
 			title: 'List',
@@ -122,7 +122,7 @@ function initMenus() {
 	profileGeneral = new UI.Menu({
 		backgroundColor: 'white',
 		textColor: 'black',
-		highlightBackgroundColor: 'blue',
+		highlightBackgroundColor: 'cobaltBlue',
 		highlightTextColor: 'black',
 		sections: [{
 			title: 'General',
@@ -159,7 +159,7 @@ function initMenus() {
 	profileAnime = new UI.Menu({
 		backgroundColor: 'white',
 		textColor: 'black',
-		highlightBackgroundColor: 'blue',
+		highlightBackgroundColor: 'cobaltBlue',
 		highlightTextColor: 'black',
 		sections: [{
 			title: 'Anime',
@@ -190,7 +190,7 @@ function initMenus() {
 	profileManga = new UI.Menu({
 		backgroundColor: 'white',
 		textColor: 'black',
-		highlightBackgroundColor: 'blue',
+		highlightBackgroundColor: 'cobaltBlue',
 		highlightTextColor: 'black',
 		sections: [{
 			title: 'Manga',
@@ -221,7 +221,7 @@ function initMenus() {
 	friendsMenu = new UI.Menu({
 		backgroundColor: 'white',
 		textColor: 'black',
-		highlightBackgroundColor: 'blue',
+		highlightBackgroundColor: 'cobaltBlue',
 		highlightTextColor: 'black',
 		sections: [{
 			title: 'Friends (' + String(friends.length) + ')',
@@ -293,7 +293,7 @@ var splashBackground = new UI.Rect({
 animeMenu = new UI.Menu({
   backgroundColor: 'white',
   textColor: 'black',
-  highlightBackgroundColor: 'blue',
+  highlightBackgroundColor: 'cobaltBlue',
   highlightTextColor: 'black',
   sections: [{
     title: 'Anime',
@@ -318,7 +318,7 @@ animeMenu = new UI.Menu({
 mangaMenu = new UI.Menu({
   backgroundColor: 'white',
   textColor: 'black',
-  highlightBackgroundColor: 'blue',
+  highlightBackgroundColor: 'cobaltBlue',
   highlightTextColor: 'black',
   sections: [{
     title: 'Manga',
@@ -343,7 +343,7 @@ mangaMenu = new UI.Menu({
 var profileMenu = new UI.Menu({
   backgroundColor: 'white',
   textColor: 'black',
-  highlightBackgroundColor: 'blue',
+  highlightBackgroundColor: 'cobaltBlue',
   highlightTextColor: 'black',
   sections: [{
     title: 'Profile',
@@ -359,6 +359,7 @@ var profileMenu = new UI.Menu({
 
 //Not logged in message
 var notLoggedIn = new UI.Card({
+	backgroundColor: 'cobaltBlue',
   body: 'You are not logged in to MAL. Open the settings on your phone to login.'
 });
 
