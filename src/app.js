@@ -19,31 +19,9 @@ var artPage;
 
 //Variables
 var current_watch;
-var gender = 'Unknown';
-var birthday = 'January 1, 1900';
-var location = 'City, Country';
-var joinDate = 'January 1, 1900';
-var accessRank = 'Member';
-var animeListViews = '0';
-var mangaListViews = '0';
-var comments = '0';
-var numFriends = '0';
-var avatarUrl = 'http://cdn.myanimelist.net/images/na.gif';
-var lastOnline = 'Now';
-var animeDays = '0.0';
-var animeWatching = '0';
-var animeCompleted = '0';
-var animeOnHold = '0';
-var animeDropped = '0';
-var animePlanToWatch = '0';
-var animeTotalEntries = '0';
-var mangaDays = '0.0';
-var mangaReading = '0';
-var mangaCompleted = '0';
-var mangaOnHold = '0';
-var mangaDropped = '0';
-var mangaPlanToRead = '0';
-var mangaTotalEntries = '0';
+var profile = {"avatar_url":"http://cdn.myanimelist.net/images/na.gif","details":{"last_online":"Now","gender":"Unknown","birthday":"January  1, 1900","location":"City, Country","website":"http://example.com","join_date":"January 1, 1900","access_rank":"Member","anime_list_views":0,"manga_list_views":0,"forum_posts":0,"aim":null,"comments":0,"msn":null,"yahoo":null},"anime_stats":{"time_days":0,"watching":0,"completed":0,"on_hold":0,"dropped":0,"plan_to_watch":0,"total_entries":0},"manga_stats":{"time_days":0,"reading":0,"completed":0,"on_hold":0,"dropped":0,"plan_to_read":0,"total_entries":0}};
+var friends = {};
+var animeList;
 var mode = 'anime';
 var username = 'Default';
 var id = '1';
@@ -51,7 +29,7 @@ var password = 'default';
 var configSend = '';
 var loggedIn = false;
 
-//Temporary Login
+//Temporary Login (for testing only)
 //Settings.data('loggedIn', true);
 
 //Initialize settings and stuff
@@ -68,43 +46,16 @@ function init() {
 		console.log('Let\'s ajax!');
 		ajax({ url: 'https://api.atarashiiapp.com/profile/' + username, type: 'json' },
 			function(data) {
-				avatarUrl = data.avatar_url;
-				lastOnline = data.details.last_online;
-				gender = data.details.gender;
-				birthday = data.details.birthday;
-				location = data.details.location;
-				joinDate = data.details.join_date;
-				accessRank = data.details.access_rank;
-				animeListViews = String(data.details.anime_list_views);
-				mangaListViews = String(data.details.manga_list_views);
-				comments = String(data.details.comments);
-				//Anime stats
-				animeDays = String(data.anime_stats.time_days);
-				animeWatching = String(data.anime_stats.watching);
-				animeCompleted = String(data.anime_stats.completed);
-				animeOnHold = String(data.anime_stats.on_hold);
-				animeDropped = String(data.anime_stats.dropped);
-				animePlanToWatch = String(data.anime_stats.plan_to_watch);
-				animeTotalEntries = String(data.anime_stats.total_entries);
-				//Manga stats
-				mangaDays = String(data.manga_stats.time_days);
-				mangaReading = String(data.manga_stats.reading);
-				mangaCompleted = String(data.manga_stats.completed);
-				mangaOnHold = String(data.manga_stats.on_hold);
-				mangaDropped = String(data.manga_stats.dropped);
-				mangaPlanToRead = String(data.manga_stats.plan_to_read);
-				mangaTotalEntries = String(data.manga_stats.total_entries);
+				profile = data;
 				
 				//console.log('main data: ' + JSON.stringify(data, null, 4));
 				
 				ajax({ url: 'https://api.atarashiiapp.com/friends/' + username, type: 'json' },
 					function(data) {
-						numFriends = String(data.length);
+						friends = data;
 						//console.log('friends: ' + JSON.stringify(data, null, 4));
 					}
 				);
-				
-				console.log(avatarUrl);
 
 				//Initialize the menus
 				initMenus();
@@ -117,195 +68,7 @@ function init() {
 	}
 }
 
-//Initialize those dynamic menus. To be called after online request.
-function initMenus() {
-	console.log('Initializing those dynamic menus');
-	//First, update the subtitles for the main menus
-	animeMenu.item(0, 0, {title: 'My Profile', subtitle: 'Spent Days: ' + animeDays});
-	mangaMenu.item(0, 0, {title: 'My Profile', subtitle: 'Spent Days: ' + mangaDays});
-	
-	animeList = new UI.Menu({
-		backgroundColor: 'white',
-		textColor: 'black',
-		highlightBackgroundColor: 'blue',
-		highlightTextColor: 'black',
-		sections: [{
-			title: 'List',
-			items: [{
-				title: '(' + animeWatching + ') Watching'
-			}, {
-				title: '(' + animeCompleted + ') Completed'
-			}, {
-				title: '(' + animeOnHold + ') On Hold'
-			}, {
-				title: '(' + animeDropped + ') Dropped'
-			}, {
-				title: '(' + animePlanToWatch + ') Plan to Watch'
-			}]
-		}]
-	});
-	mangaList = new UI.Menu({
-		backgroundColor: 'white',
-		textColor: 'black',
-		highlightBackgroundColor: 'blue',
-		highlightTextColor: 'black',
-		sections: [{
-			title: 'List',
-			items: [{
-				title: '(' + mangaReading + ') Reading'
-			}, {
-				title: '(' + mangaCompleted + ') Completed'
-			}, {
-				title: '(' + mangaOnHold + ') On Hold'
-			}, {
-				title: '(' + mangaDropped + ') Dropped'
-			}, {
-				title: '(' + mangaPlanToRead + ') Plan to Read'
-			}]
-		}]
-	});
-	profileGeneral = new UI.Menu({
-		backgroundColor: 'white',
-		textColor: 'black',
-		highlightBackgroundColor: 'blue',
-		highlightTextColor: 'black',
-		sections: [{
-			title: 'General',
-			items: [{
-				title: 'Username',
-				subtitle: username
-			}, {
-				title: 'Gender',
-				subtitle: gender
-			}, {
-				title: 'Birthday',
-				subtitle: birthday
-			}, {
-				title: 'Location',
-				subtitle: location
-			}, {
-				title: 'Join Date',
-				subtitle: joinDate
-			}, {
-				title: 'Access Rank',
-				subtitle: accessRank
-			}, {
-				title: 'Anime List Views',
-				subtitle: animeListViews
-			}, {
-				title: 'Manga List Views',
-				subtitle: mangaListViews
-			}, {
-				title: 'Comments',
-				subtitle: comments
-			}]
-		}]
-	});
-	profileAnime = new UI.Menu({
-		backgroundColor: 'white',
-		textColor: 'black',
-		highlightBackgroundColor: 'blue',
-		highlightTextColor: 'black',
-		sections: [{
-			title: 'Anime',
-			items: [{
-				title: 'Time (days)',
-				subtitle: animeDays
-			}, {
-				title: 'Watching',
-				subtitle: animeWatching
-			}, {
-				title: 'Completed',
-				subtitle: animeCompleted
-			}, {
-				title: 'On Hold',
-				subtitle: animeOnHold
-			}, {
-				title: 'Dropped',
-				subtitle: animeDropped
-			}, {
-				title: 'Plan to Watch',
-				subtitle: animePlanToWatch
-			}, {
-				title: 'Total Entries',
-				subtitle: animeTotalEntries
-			}]
-		}]
-	});
-	profileManga = new UI.Menu({
-		backgroundColor: 'white',
-		textColor: 'black',
-		highlightBackgroundColor: 'blue',
-		highlightTextColor: 'black',
-		sections: [{
-			title: 'Manga',
-			items: [{
-				title: 'Time (days)',
-				subtitle: mangaDays
-			}, {
-				title: 'Reading',
-				subtitle: mangaReading
-			}, {
-				title: 'Completed',
-				subtitle: mangaCompleted
-			}, {
-				title: 'On Hold',
-				subtitle: mangaOnHold
-			}, {
-				title: 'Dropped',
-				subtitle: mangaDropped
-			}, {
-				title: 'Plan to Read',
-				subtitle: mangaPlanToRead
-			}, {
-				title: 'Total Entries',
-				subtitle: mangaTotalEntries
-			}]
-		}]
-	});
-	friends = new UI.Menu({
-		backgroundColor: 'white',
-		textColor: 'black',
-		highlightBackgroundColor: 'blue',
-		highlightTextColor: 'black',
-		sections: [{
-			title: 'Friends (' + numFriends + ')',
-			items: [{
-				title: 'No Friends'
-			}]
-		}]
-	});
-}
-
-//Set the artwork to display for the current anime/manga. Takes one parameter: the artwork url. Will load color/b&w depending on platform.
-function setArtwork(imageUrl) {
-	var urlToUse;
-	if (current_watch.platform == 'basalt') {
-		urlToUse = 'http://floatingcube.web44.net/more/MAL_client/resize/?image=' + encodeURIComponent(imageUrl);
-	} else {
-		urlToUse = 'http://floatingcube.web44.net/more/MAL_client/dither/?image=' + encodeURIComponent(imageUrl);
-	}
-	art = new UI.Image({
-		position: new Vector2(0, 0),
-		size: new Vector2(144, 168),
-		image: urlToUse
-	});
-
-	artLoadingText = new UI.Text({
-		position: new Vector2(0, 50),
-		size: new Vector2(144, 168),
-		text:'Loading...',
-		font:'GOTHIC_28',
-		color:'white',
-		textOverflow:'wrap',
-		textAlign:'center'
-	});
-
-	artPage = new UI.Window({fullscreen: true});
-
-	artPage.add(artLoadingText);
-	artPage.add(art);
-}
+//STATIC MENUS/UI ELEMENTS
 
 //Make that splash window!
 var splash = new UI.Window();
@@ -342,7 +105,7 @@ var animeMenu = new UI.Menu({
     title: 'Anime',
     items: [{
       title: 'My Profile',
-			subtitle: 'Spent days: ' + animeDays
+			subtitle: 'Spent days: ' + String(profile.anime_stats.time_days)
     }, {
       title: 'Switch to Manga'
     }, {
@@ -367,7 +130,7 @@ var mangaMenu = new UI.Menu({
     title: 'Manga',
     items: [{
       title: 'My Profile',
-			subtitle: 'Spent days: ' + mangaDays
+			subtitle: 'Spent days: ' + String(profile.manga_stats.time_days)
     }, {
       title: 'Switch to Anime'
     }, {
@@ -404,6 +167,198 @@ var profile = new UI.Menu({
 var notLoggedIn = new UI.Card({
   body: 'You are not logged in to MAL. Open the settings on your phone to login.'
 });
+
+//DYNAMIC MENUS/UI ELEMENTS
+
+//Initialize those dynamic menus. To be called after online request.
+function initMenus() {
+	console.log('Initializing those dynamic menus');
+	//First, update the subtitles for the main menus
+	animeMenu.item(0, 0, {title: 'My Profile', subtitle: 'Spent Days: ' + String(profile.anime_stats.time_days)});
+	mangaMenu.item(0, 0, {title: 'My Profile', subtitle: 'Spent Days: ' + String(profile.manga_stats.time_days)});
+	
+	animeList = new UI.Menu({
+		backgroundColor: 'white',
+		textColor: 'black',
+		highlightBackgroundColor: 'blue',
+		highlightTextColor: 'black',
+		sections: [{
+			title: 'List',
+			items: [{
+				title: '(' + String(profile.anime_stats.watching) + ') Watching'
+			}, {
+				title: '(' + String(profile.anime_stats.completed) + ') Completed'
+			}, {
+				title: '(' + String(profile.anime_stats.on_hold) + ') On Hold'
+			}, {
+				title: '(' + String(profile.anime_stats.dropped) + ') Dropped'
+			}, {
+				title: '(' + String(profile.anime_stats.plan_to_watch) + ') Plan to Watch'
+			}]
+		}]
+	});
+	mangaList = new UI.Menu({
+		backgroundColor: 'white',
+		textColor: 'black',
+		highlightBackgroundColor: 'blue',
+		highlightTextColor: 'black',
+		sections: [{
+			title: 'List',
+			items: [{
+				title: '(' + String(profile.manga_stats.reading) + ') Reading'
+			}, {
+				title: '(' + String(profile.manga_stats.completed) + ') Completed'
+			}, {
+				title: '(' + String(profile.manga_stats.on_hold) + ') On Hold'
+			}, {
+				title: '(' + String(profile.manga_stats.dropped) + ') Dropped'
+			}, {
+				title: '(' + String(profile.manga_stats.plan_to_read) + ') Plan to Read'
+			}]
+		}]
+	});
+	profileGeneral = new UI.Menu({
+		backgroundColor: 'white',
+		textColor: 'black',
+		highlightBackgroundColor: 'blue',
+		highlightTextColor: 'black',
+		sections: [{
+			title: 'General',
+			items: [{
+				title: 'Username',
+				subtitle: username
+			}, {
+				title: 'Gender',
+				subtitle: profile.details.gender
+			}, {
+				title: 'Birthday',
+				subtitle: profile.details.birthday
+			}, {
+				title: 'Location',
+				subtitle: profile.details.location
+			}, {
+				title: 'Join Date',
+				subtitle: profile.details.join_date
+			}, {
+				title: 'Access Rank',
+				subtitle: profile.details.access_rank
+			}, {
+				title: 'Anime List Views',
+				subtitle: String(profile.details.anime_list_views)
+			}, {
+				title: 'Manga List Views',
+				subtitle: String(profile.details.manga_list_views)
+			}, {
+				title: 'Comments',
+				subtitle: String(profile.details.comments)
+			}]
+		}]
+	});
+	profileAnime = new UI.Menu({
+		backgroundColor: 'white',
+		textColor: 'black',
+		highlightBackgroundColor: 'blue',
+		highlightTextColor: 'black',
+		sections: [{
+			title: 'Anime',
+			items: [{
+				title: 'Time (days)',
+				subtitle: String(profile.anime_stats.time_days)
+			}, {
+				title: 'Watching',
+				subtitle: String(profile.anime_stats.watching)
+			}, {
+				title: 'Completed',
+				subtitle: String(profile.anime_stats.completed)
+			}, {
+				title: 'On Hold',
+				subtitle: String(profile.anime_stats.on_hold)
+			}, {
+				title: 'Dropped',
+				subtitle: String(profile.anime_stats.dropped)
+			}, {
+				title: 'Plan to Watch',
+				subtitle: String(profile.anime_stats.plan_to_watch)
+			}, {
+				title: 'Total Entries',
+				subtitle: String(profile.anime_stats.total_entries)
+			}]
+		}]
+	});
+	profileManga = new UI.Menu({
+		backgroundColor: 'white',
+		textColor: 'black',
+		highlightBackgroundColor: 'blue',
+		highlightTextColor: 'black',
+		sections: [{
+			title: 'Manga',
+			items: [{
+				title: 'Time (days)',
+				subtitle: String(profile.manga_stats.time_days)
+			}, {
+				title: 'Reading',
+				subtitle: String(profile.manga_stats.reading)
+			}, {
+				title: 'Completed',
+				subtitle: String(profile.manga_stats.completed)
+			}, {
+				title: 'On Hold',
+				subtitle: String(profile.manga_stats.on_hold)
+			}, {
+				title: 'Dropped',
+				subtitle: String(profile.manga_stats.dropped)
+			}, {
+				title: 'Plan to Read',
+				subtitle: String(profile.manga_stats.plan_to_read)
+			}, {
+				title: 'Total Entries',
+				subtitle: String(profile.manga_stats.total_entries)
+			}]
+		}]
+	});
+	friends = new UI.Menu({
+		backgroundColor: 'white',
+		textColor: 'black',
+		highlightBackgroundColor: 'blue',
+		highlightTextColor: 'black',
+		sections: [{
+			title: 'Friends (' + String(friends.length) + ')',
+			items: [{
+				title: 'No Friends'
+			}]
+		}]
+	});
+}
+
+//Set the artwork to display for the current anime/manga. Takes one parameter: the artwork url. Will load color/b&w depending on platform.
+function setArtwork(imageUrl) {
+	var urlToUse;
+	if (current_watch.platform == 'basalt') {
+		urlToUse = 'http://floatingcube.web44.net/more/MAL_client/resize/?image=' + encodeURIComponent(imageUrl);
+	} else {
+		urlToUse = 'http://floatingcube.web44.net/more/MAL_client/dither/?image=' + encodeURIComponent(imageUrl);
+	}
+	art = new UI.Image({
+		position: new Vector2(0, 0),
+		size: new Vector2(144, 168),
+		image: urlToUse
+	});
+
+	artLoadingText = new UI.Text({
+		position: new Vector2(0, 50),
+		size: new Vector2(144, 168),
+		text:'Loading...',
+		font:'GOTHIC_28',
+		color:'white',
+		textOverflow:'wrap',
+		textAlign:'center'
+	});
+
+	artPage = new UI.Window({fullscreen: true});
+
+	artPage.add(artLoadingText);
+	artPage.add(art);
+}
 
 splash.add(splashBackground);
 splash.add(splashImage);
@@ -503,7 +458,6 @@ Pebble.addEventListener('webviewclosed',
 			Settings.data('password', configReply.password);
 			Settings.data('id', configReply.id);
 			init();
-			//loggedIn = true;
 			loadMenu();
 		}
   }
