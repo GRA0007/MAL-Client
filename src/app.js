@@ -75,31 +75,31 @@ function init() {
 				location = data.details.location;
 				joinDate = data.details.join_date;
 				accessRank = data.details.access_rank;
-				animeListViews = data.details.anime_list_views;
-				mangaListViews = data.details.manga_list_views;
-				comments = data.details.comments;
+				animeListViews = String(data.details.anime_list_views);
+				mangaListViews = String(data.details.manga_list_views);
+				comments = String(data.details.comments);
 				//Anime stats
-				animeDays = data.anime_stats.time_days;
-				animeWatching = data.anime_stats.watching;
-				animeCompleted = data.anime_stats.completed;
-				animeOnHold = data.anime_stats.on_hold;
-				animeDropped = data.anime_stats.dropped;
-				animePlanToWatch = data.anime_stats.plan_to_watch;
-				animeTotalEntries = data.anime_stats.total_entries;
+				animeDays = String(data.anime_stats.time_days);
+				animeWatching = String(data.anime_stats.watching);
+				animeCompleted = String(data.anime_stats.completed);
+				animeOnHold = String(data.anime_stats.on_hold);
+				animeDropped = String(data.anime_stats.dropped);
+				animePlanToWatch = String(data.anime_stats.plan_to_watch);
+				animeTotalEntries = String(data.anime_stats.total_entries);
 				//Manga stats
-				mangaDays = data.manga_stats.time_days;
-				mangaReading = data.manga_stats.reading;
-				mangaCompleted = data.manga_stats.completed;
-				mangaOnHold = data.manga_stats.on_hold;
-				mangaDropped = data.manga_stats.dropped;
-				mangaPlanToRead = data.manga_stats.plan_to_read;
-				mangaTotalEntries = data.manga_stats.total_entries;
+				mangaDays = String(data.manga_stats.time_days);
+				mangaReading = String(data.manga_stats.reading);
+				mangaCompleted = String(data.manga_stats.completed);
+				mangaOnHold = String(data.manga_stats.on_hold);
+				mangaDropped = String(data.manga_stats.dropped);
+				mangaPlanToRead = String(data.manga_stats.plan_to_read);
+				mangaTotalEntries = String(data.manga_stats.total_entries);
 				
 				//console.log('main data: ' + JSON.stringify(data, null, 4));
 				
 				ajax({ url: 'https://api.atarashiiapp.com/friends/' + username, type: 'json' },
 					function(data) {
-						numFriends = data.length;
+						numFriends = String(data.length);
 						//console.log('friends: ' + JSON.stringify(data, null, 4));
 					}
 				);
