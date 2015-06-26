@@ -10,7 +10,9 @@ var mangaList;
 var profileGeneral;
 var profileAnime;
 var profileManga;
-var friends;
+var friendsMenu;
+var animeMenu;
+var mangaMenu;
 
 //Art Window
 var art;
@@ -67,106 +69,6 @@ function init() {
 		console.log('Eek! You\'re not logged in! You should probably login using the config window.');
 	}
 }
-
-//STATIC MENUS/UI ELEMENTS
-
-//Make that splash window!
-var splash = new UI.Window();
-
-var splashImage = new UI.Image({
-  position: new Vector2(0, 15),
-  size: new Vector2(144, 100),
-  image:'images/logo.png'
-});
-
-var splashText = new UI.Text({
-  position: new Vector2(0, 110),
-  size: new Vector2(144, 168),
-  text:'CLIENT',
-  font:'GOTHIC_28',
-  color:'black',
-  textOverflow:'wrap',
-  textAlign:'center'
-});
-
-var splashBackground = new UI.Rect({
-	position: new Vector2(0, 0),
-	size: new Vector2(144, 168),
-	backgroundColor: 'white'
-});
-
-//Default menu in anime mode
-var animeMenu = new UI.Menu({
-  backgroundColor: 'white',
-  textColor: 'black',
-  highlightBackgroundColor: 'blue',
-  highlightTextColor: 'black',
-  sections: [{
-    title: 'Anime',
-    items: [{
-      title: 'My Profile',
-			subtitle: 'Spent days: ' + String(profile.anime_stats.time_days)
-    }, {
-      title: 'Switch to Manga'
-    }, {
-      title: 'List'
-    }, {
-      title: 'Anime'
-    }, {
-      title: 'Recent Anime'
-    }, {
-      title: 'Friends'
-    }]
-  }]
-});
-
-//Default menu in manga mode
-var mangaMenu = new UI.Menu({
-  backgroundColor: 'white',
-  textColor: 'black',
-  highlightBackgroundColor: 'blue',
-  highlightTextColor: 'black',
-  sections: [{
-    title: 'Manga',
-    items: [{
-      title: 'My Profile',
-			subtitle: 'Spent days: ' + String(profile.manga_stats.time_days)
-    }, {
-      title: 'Switch to Anime'
-    }, {
-      title: 'List'
-    }, {
-      title: 'Manga'
-    }, {
-      title: 'Recent Manga'
-    }, {
-      title: 'Friends'
-    }]
-  }]
-});
-
-//1st level profile menu
-var profile = new UI.Menu({
-  backgroundColor: 'white',
-  textColor: 'black',
-  highlightBackgroundColor: 'blue',
-  highlightTextColor: 'black',
-  sections: [{
-    title: 'Profile',
-    items: [{
-			title: 'General'
-		}, {
-      title: 'Anime'
-    }, {
-      title: 'Manga'
-    }]
-  }]
-});
-
-//Not logged in message
-var notLoggedIn = new UI.Card({
-  body: 'You are not logged in to MAL. Open the settings on your phone to login.'
-});
 
 //DYNAMIC MENUS/UI ELEMENTS
 
@@ -316,7 +218,7 @@ function initMenus() {
 			}]
 		}]
 	});
-	friends = new UI.Menu({
+	friendsMenu = new UI.Menu({
 		backgroundColor: 'white',
 		textColor: 'black',
 		highlightBackgroundColor: 'blue',
@@ -360,6 +262,106 @@ function setArtwork(imageUrl) {
 	artPage.add(art);
 }
 
+//STATIC MENUS/UI ELEMENTS
+
+//Make that splash window!
+var splash = new UI.Window();
+
+var splashImage = new UI.Image({
+  position: new Vector2(0, 15),
+  size: new Vector2(144, 100),
+  image:'images/logo.png'
+});
+
+var splashText = new UI.Text({
+  position: new Vector2(0, 110),
+  size: new Vector2(144, 168),
+  text:'CLIENT',
+  font:'GOTHIC_28',
+  color:'black',
+  textOverflow:'wrap',
+  textAlign:'center'
+});
+
+var splashBackground = new UI.Rect({
+	position: new Vector2(0, 0),
+	size: new Vector2(144, 168),
+	backgroundColor: 'white'
+});
+
+//Default menu in anime mode
+animeMenu = new UI.Menu({
+  backgroundColor: 'white',
+  textColor: 'black',
+  highlightBackgroundColor: 'blue',
+  highlightTextColor: 'black',
+  sections: [{
+    title: 'Anime',
+    items: [{
+      title: 'My Profile',
+			subtitle: 'Spent days: 0'
+    }, {
+      title: 'Switch to Manga'
+    }, {
+      title: 'List'
+    }, {
+      title: 'Anime'
+    }, {
+      title: 'Recent Anime'
+    }, {
+      title: 'Friends'
+    }]
+  }]
+});
+
+//Default menu in manga mode
+mangaMenu = new UI.Menu({
+  backgroundColor: 'white',
+  textColor: 'black',
+  highlightBackgroundColor: 'blue',
+  highlightTextColor: 'black',
+  sections: [{
+    title: 'Manga',
+    items: [{
+      title: 'My Profile',
+			subtitle: 'Spent days: 0'
+    }, {
+      title: 'Switch to Anime'
+    }, {
+      title: 'List'
+    }, {
+      title: 'Manga'
+    }, {
+      title: 'Recent Manga'
+    }, {
+      title: 'Friends'
+    }]
+  }]
+});
+
+//1st level profile menu
+var profileMenu = new UI.Menu({
+  backgroundColor: 'white',
+  textColor: 'black',
+  highlightBackgroundColor: 'blue',
+  highlightTextColor: 'black',
+  sections: [{
+    title: 'Profile',
+    items: [{
+			title: 'General'
+		}, {
+      title: 'Anime'
+    }, {
+      title: 'Manga'
+    }]
+  }]
+});
+
+//Not logged in message
+var notLoggedIn = new UI.Card({
+  body: 'You are not logged in to MAL. Open the settings on your phone to login.'
+});
+
 splash.add(splashBackground);
 splash.add(splashImage);
 splash.add(splashText);
@@ -393,7 +395,7 @@ animeMenu.on('select', function(e) {
 	console.log(e.item.title);
 	console.log(e.itemIndex);
 	if (e.itemIndex === 0) {
-		profile.show();
+		profileMenu.show();
 	} else if (e.itemIndex == 1) {
 		mode = 'manga';
 		loadMenu();
@@ -406,7 +408,7 @@ animeMenu.on('select', function(e) {
 	} else if (e.itemIndex == 4) {
 		//recent anime
 	} else if (e.itemIndex == 5) {
-		friends.show();
+		friendsMenu.show();
 	}
 });
 
@@ -414,7 +416,7 @@ mangaMenu.on('select', function(e) {
 	console.log(e.item.title);
 	console.log(e.itemIndex);
 	if (e.itemIndex === 0) {
-		profile.show();
+		profileMenu.show();
 	} else if (e.itemIndex == 1) {
 		mode = 'anime';
 		loadMenu();
@@ -425,11 +427,11 @@ mangaMenu.on('select', function(e) {
 	} else if (e.itemIndex == 4) {
 		//recent manga
 	} else if (e.itemIndex == 5) {
-		friends.show();
+		friendsMenu.show();
 	}
 });
 
-profile.on('select', function(e) {
+profileMenu.on('select', function(e) {
 	console.log(e.item.title);
 	console.log(e.itemIndex);
 	if (e.itemIndex === 0) {
