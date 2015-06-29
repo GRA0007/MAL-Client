@@ -13,6 +13,7 @@ var profileManga;
 var friendsMenu;
 var animeMenu;
 var mangaMenu;
+var detailedView;
 
 //Art Window
 var art;
@@ -33,6 +34,19 @@ var loggedIn = false;
 
 //Temporary Login (for testing only)
 //Settings.data('loggedIn', true);
+
+//Utility functions
+function strip_tags(input, allowed) {
+	allowed = (((allowed || "") + "")
+							.toLowerCase()
+							.match(/<[a-z][a-z0-9]*>/g) || [])
+	.join(''); // making sure the allowed arg is a string containing only tags in lowercase (<a><b><c>)
+	var tags = /<\/?([a-z][a-z0-9]*)\b[^>]*>/gi,
+			commentsAndPhpTags = /<!--[\s\S]*?-->|<\?(?:php)?[\s\S]*?\?>/gi;
+	return input.replace(commentsAndPhpTags, '').replace(tags, function($0, $1){
+		return allowed.indexOf('<' + $1.toLowerCase() + '>') > -1 ? $0 : '';
+	});
+}
 
 //Initialize settings and stuff
 function init() {
@@ -55,7 +69,7 @@ function init() {
 				ajax({ url: 'https://api.atarashiiapp.com/friends/' + username, type: 'json' },
 					function(data) {
 						friends = data;
-						//console.log('friends: ' + JSON.stringify(data, null, 4));
+						console.log('friends: ' + JSON.stringify(friends, null, 4));
 					}
 				);
 
@@ -83,7 +97,7 @@ function initMenus() {
 		backgroundColor: 'white',
 		textColor: 'black',
 		highlightBackgroundColor: 'cobaltBlue',
-		highlightTextColor: 'black',
+		highlightTextColor: 'white',
 		sections: [{
 			title: 'List',
 			items: [{
@@ -103,7 +117,7 @@ function initMenus() {
 		backgroundColor: 'white',
 		textColor: 'black',
 		highlightBackgroundColor: 'cobaltBlue',
-		highlightTextColor: 'black',
+		highlightTextColor: 'white',
 		sections: [{
 			title: 'List',
 			items: [{
@@ -123,7 +137,7 @@ function initMenus() {
 		backgroundColor: 'white',
 		textColor: 'black',
 		highlightBackgroundColor: 'cobaltBlue',
-		highlightTextColor: 'black',
+		highlightTextColor: 'white',
 		sections: [{
 			title: 'General',
 			items: [{
@@ -160,7 +174,7 @@ function initMenus() {
 		backgroundColor: 'white',
 		textColor: 'black',
 		highlightBackgroundColor: 'cobaltBlue',
-		highlightTextColor: 'black',
+		highlightTextColor: 'white',
 		sections: [{
 			title: 'Anime',
 			items: [{
@@ -191,7 +205,7 @@ function initMenus() {
 		backgroundColor: 'white',
 		textColor: 'black',
 		highlightBackgroundColor: 'cobaltBlue',
-		highlightTextColor: 'black',
+		highlightTextColor: 'white',
 		sections: [{
 			title: 'Manga',
 			items: [{
@@ -222,9 +236,9 @@ function initMenus() {
 		backgroundColor: 'white',
 		textColor: 'black',
 		highlightBackgroundColor: 'cobaltBlue',
-		highlightTextColor: 'black',
+		highlightTextColor: 'white',
 		sections: [{
-			title: 'Friends (' + String(friends.length) + ')',
+			title: 'Friends (' + String(Object.keys(friends).length) + ')',
 			items: [{
 				title: 'No Friends'
 			}]
@@ -262,6 +276,209 @@ function setArtwork(imageUrl) {
 	artPage.add(art);
 }
 
+function openDetailedView(type, id) {
+	ajax({ url: 'https://' + username + ':' + password + '@api.atarashiiapp.com/' + type + '/' + id + '?mine=1', type: 'json' },
+		function(data) {
+			var otherTitles = [{
+				title: 'English',
+				subtitle: 'meow'
+			}];
+			//Define variable sections
+			var anime_yourDetails;
+			var manga_yourDetails;
+			
+			//Set variable sections
+			if (type == 'anime') {
+				if (data.watched_status === null) {
+					anime_yourDetails = [{
+						title: 'Add to list'
+					}];
+				} else {
+					anime_yourDetails = [{
+						title: 'Status',
+						subtitle: data.watched_status
+					}, {
+						title: 'Watched',
+						subtitle: data.watched_episodes + ' / ' + data.episodes
+					}, {
+						title: 'Score',
+						subtitle: data.score
+					}];
+				}
+			} else if (type == 'manga') {
+				if (data.read_status === null) {
+					manga_yourDetails = [{
+						title: 'Add to list'
+					}];
+				} else {
+					manga_yourDetails = [{
+						title: 'Status',
+						subtitle: data.read_status
+					}, {
+						title: 'Chapters read',
+						subtitle: data.chapters_read + ' / ' + data.chapters
+					}, {
+						title: 'Volumes read',
+						subtitle: data.volumes_read + ' / ' + data.volumes
+					}, {
+						title: 'Score',
+						subtitle: data.score
+					}];
+				}
+			}
+			
+			//Make the menu
+			if (type == 'anime') {
+				detailedView = new UI.Menu({
+					backgroundColor: 'white',
+					textColor: 'black',
+					highlightBackgroundColor: 'cobaltBlue',
+					highlightTextColor: 'white',
+					sections: [{
+						title: data.title,
+						items: otherTitles
+					}, {
+						title: 'Your details',
+						items: anime_yourDetails
+					}, {
+						title: 'Details',
+						items: [{
+							title: 'Synopsis',
+							subtitle: strip_tags(data.synopsis)
+						}, {
+							title: 'Type',
+							subtitle: data.type
+						}, {
+							title: 'Episodes',
+							subtitle: data.episodes
+						}, {
+							title: 'Status',
+							subtitle: data.status
+						}, {
+							title: 'Aired',
+							subtitle: data.start_date + ' to ' + data.end_date
+						}, {
+							title: 'Score',
+							subtitle: data.members_score
+						}, {
+							title: 'Rating',
+							subtitle: data.classification
+						}, {
+							title: 'Genres',
+							subtitle: data.genres.join(", ")
+						}]
+					}, {
+						title: 'Statistics',
+						items: [{
+							title: 'Ranked',
+							subtitle: '#' + data.rank
+						}, {
+							title: 'Popularity',
+							subtitle: '#' + data.popularity_rank
+						}, {
+							title: 'Members',
+							subtitle: data.members_count
+						}, {
+							title: 'Favorites',
+							subtitle: data.favorited_count
+						}]
+					}, {
+						title: 'Adaptations' //,
+						//items: data.manga_adaptations
+					}, {
+						title: 'Prequels',
+						items: data.prequels
+					}, {
+						title: 'Sequels',
+						items: data.sequels
+					}, {
+						title: 'Side stories',
+						items: data.side_stories
+					}, {
+						title: 'Parent story',
+						items: data.parent_story
+					}, {
+						title: 'Character',
+						items: data.character_anime
+					}, {
+						title: 'Spin offs',
+						items: data.spin_offs
+					}, {
+						title: 'Summaries',
+						items: data.summaries
+					}, {
+						title: 'Alternative versions',
+						items: data.alternative_versions
+					}]
+				});
+			} else if (type == 'manga') {
+				detailedView = new UI.Menu({
+					backgroundColor: 'white',
+					textColor: 'black',
+					highlightBackgroundColor: 'cobaltBlue',
+					highlightTextColor: 'white',
+					sections: [{
+						title: data.title,
+						items: otherTitles
+					}, {
+						title: 'Your details',
+						items: manga_yourDetails
+					}, {
+						title: 'Details',
+						items: [{
+							title: 'Synopsis',
+							subtitle: strip_tags(data.synopsis)
+						}, {
+							title: 'Type',
+							subtitle: data.type
+						}, {
+							title: 'Volumes',
+							subtitle: data.volumes
+						}, {
+							title: 'Chapters',
+							subtitle: data.chapters
+						}, {
+							title: 'Status',
+							subtitle: data.status
+						}, {
+							title: 'Score',
+							subtitle: data.members_score
+						}, {
+							title: 'Genres',
+							subtitle: data.genres.join(", ")
+						}]
+					}, {
+						title: 'Statistics',
+						items: [{
+							title: 'Ranked',
+							subtitle: '#' + data.rank
+						}, {
+							title: 'Popularity',
+							subtitle: '#' + data.popularity_rank
+						}, {
+							title: 'Members',
+							subtitle: data.members_count
+						}, {
+							title: 'Favorites',
+							subtitle: data.favorited_count
+						}]
+					}, {
+						title: 'Adaptations',
+						items: data.anime_adaptations
+					}, {
+						title: 'Related',
+						items: data.related_manga
+					}, {
+						title: 'Alternative versions',
+						items: data.alternative_versions
+					}]
+				});
+			}
+			detailedView.show();
+		}
+	);
+}
+
 //STATIC MENUS/UI ELEMENTS
 
 //Make that splash window!
@@ -278,7 +495,7 @@ var splashText = new UI.Text({
   size: new Vector2(144, 168),
   text:'CLIENT',
   font:'GOTHIC_28',
-  color:'black',
+  color:'cobaltBlue',
   textOverflow:'wrap',
   textAlign:'center'
 });
@@ -294,7 +511,7 @@ animeMenu = new UI.Menu({
   backgroundColor: 'white',
   textColor: 'black',
   highlightBackgroundColor: 'cobaltBlue',
-  highlightTextColor: 'black',
+  highlightTextColor: 'white',
   sections: [{
     title: 'Anime',
     items: [{
@@ -319,7 +536,7 @@ mangaMenu = new UI.Menu({
   backgroundColor: 'white',
   textColor: 'black',
   highlightBackgroundColor: 'cobaltBlue',
-  highlightTextColor: 'black',
+  highlightTextColor: 'white',
   sections: [{
     title: 'Manga',
     items: [{
@@ -344,7 +561,7 @@ var profileMenu = new UI.Menu({
   backgroundColor: 'white',
   textColor: 'black',
   highlightBackgroundColor: 'cobaltBlue',
-  highlightTextColor: 'black',
+  highlightTextColor: 'white',
   sections: [{
     title: 'Profile',
     items: [{
@@ -360,6 +577,7 @@ var profileMenu = new UI.Menu({
 //Not logged in message
 var notLoggedIn = new UI.Card({
 	backgroundColor: 'cobaltBlue',
+	textColor: 'white',
   body: 'You are not logged in to MAL. Open the settings on your phone to login.'
 });
 
@@ -404,8 +622,7 @@ animeMenu.on('select', function(e) {
 		animeList.show();
 	} else if (e.itemIndex == 3) {
 		//anime
-		setArtwork('http://cdn.myanimelist.net/images/anime/13/17405.jpg');
-		artPage.show();
+		openDetailedView('anime', 26243);
 	} else if (e.itemIndex == 4) {
 		//recent anime
 	} else if (e.itemIndex == 5) {
