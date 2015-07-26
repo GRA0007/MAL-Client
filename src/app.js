@@ -279,10 +279,27 @@ function setArtwork(imageUrl) {
 function openDetailedView(type, id) {
 	ajax({ url: 'https://' + username + ':' + password + '@api.atarashiiapp.com/' + type + '/' + id + '?mine=1', type: 'json' },
 		function(data) {
-			var otherTitles = [{
-				title: 'English',
-				subtitle: 'meow'
-			}];
+			//Get the alternate titles
+			var otherTitles = [];
+			if (data.other_titles.english != 'null') {
+				otherTitles.push({
+					title: 'English',
+					subtitle: data.other_titles.english.join(", ")
+				});
+			}
+			if (data.other_titles.japanese != 'null') {
+				otherTitles.push({
+					title: 'Japanese',
+					subtitle: data.other_titles.japanese.join(", ")
+				});
+			}
+			if (data.other_titles.synonyms != 'null') {
+				otherTitles.push({
+					title: 'Synonyms',
+					subtitle: data.other_titles.synonyms.join(", ")
+				});
+			}
+
 			//Define variable sections
 			var anime_yourDetails;
 			var manga_yourDetails;
@@ -382,33 +399,6 @@ function openDetailedView(type, id) {
 							title: 'Favorites',
 							subtitle: data.favorited_count
 						}]
-					}, {
-						title: 'Adaptations' //,
-						//items: data.manga_adaptations
-					}, {
-						title: 'Prequels',
-						items: data.prequels
-					}, {
-						title: 'Sequels',
-						items: data.sequels
-					}, {
-						title: 'Side stories',
-						items: data.side_stories
-					}, {
-						title: 'Parent story',
-						items: data.parent_story
-					}, {
-						title: 'Character',
-						items: data.character_anime
-					}, {
-						title: 'Spin offs',
-						items: data.spin_offs
-					}, {
-						title: 'Summaries',
-						items: data.summaries
-					}, {
-						title: 'Alternative versions',
-						items: data.alternative_versions
 					}]
 				});
 			} else if (type == 'manga') {
@@ -462,15 +452,6 @@ function openDetailedView(type, id) {
 							title: 'Favorites',
 							subtitle: data.favorited_count
 						}]
-					}, {
-						title: 'Adaptations',
-						items: data.anime_adaptations
-					}, {
-						title: 'Related',
-						items: data.related_manga
-					}, {
-						title: 'Alternative versions',
-						items: data.alternative_versions
 					}]
 				});
 			}
